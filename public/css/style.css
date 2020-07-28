@@ -1,0 +1,278 @@
+.big-banner{
+    background-image: url('../Images/header_default.jpg');
+    background-size: 100%;
+    height: 500px; padding-top: 150px;
+}
+
+.fresh-content{
+    background: linear-gradient(-45deg,#ec5252,#6e1a52);
+}
+
+.blue-card-content{
+  background: linear-gradient(-45deg,#7391e4,#340788);
+}
+
+.footer-shade{
+  background: linear-gradient(-45deg,#509ECA,#2B4E7D);
+}
+
+.red-card-content{
+  background: linear-gradient(-45deg,#ec5252,#6e1a52);
+}
+
+.red-2-card-content{
+  background: linear-gradient(-15deg,#faf8f8,#e01638);
+}
+
+.green-card-content{
+  background: linear-gradient(-45deg,#a4ec52,#2e6e1a);
+}
+
+.orange-card-content{
+  background: linear-gradient(-45deg,#ec8f52,#6e401a);
+}
+
+.purple-card-content{
+  background: linear-gradient(-45deg,#ad4bb6,#6b1074);
+}
+
+.yellow-card-content{
+  background: linear-gradient(-45deg,#eff15f,#e9da10);
+}
+
+.new-container {
+    position: relative;
+    text-align: center;
+    color: white;    
+  }
+
+  /* Bottom left text */
+.bottom-left {
+    position: absolute;
+    bottom: 8px;
+    left: 16px;
+  }
+  
+  /* Top left text */
+  .top-left {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+  }
+  
+  /* Top right text */
+  .top-right {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+  }
+
+
+  /* Bottom right text */
+.bottom-right {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+  }
+  
+  /* Centered text */
+  .centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .img-circle {
+    border-radius: 50%;
+    height: 250px;
+}
+
+.header-margin {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+/* Page Background Details */
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
+.bg {
+  /* The image used */
+  background-image: url("../Images/body_background.png");
+
+  /* Full height */
+  height: 70%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
+.bg-card {
+  /* The image used */
+  background-image: url("../Images/card_background_1.jpg");
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-card-2 {
+  /* The image used */
+  background-image: url("../Images/card_background_2.jpg");
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Profile Page Background */
+
+body
+{
+    font-family: 'Open Sans', sans-serif;
+}
+
+.fb-profile img.fb-image-lg{
+    z-index: 0;
+    width: 100%;  
+    height: 300px;
+    max-height: 500px;
+    margin-bottom: 0px;
+}
+
+.fb-image-profile
+{
+    margin: 0px 0px 0px 0px;
+    z-index: 9;    
+    max-width: 200px;
+    max-height: 200px;
+    border: solid white 5px;
+    border-radius: 50%;
+}
+
+.fb-image-profile-mb
+{
+    margin: 0px 0px 0px 0px;
+    z-index: 9;    
+    max-width: 150px;
+    max-height: 150px;
+    border: solid white 5px;
+    border-radius: 50%;
+}
+
+/* Some Image Handling css Links */
+/* Resize Images : http://jsfiddle.net/QRU4w/ */
+
+/* Round Corner */
+.rcorners {
+  border-radius: 25px;    
+}
+
+/* For long text */
+.long-text-old{
+  line-height:1.2em;   
+  height:3.6em;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+.long-text{
+  display: block;
+    display: -webkit-box;    
+    -webkit-line-clamp: 3;
+    line-height:1.2em;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.long-hdr-text{
+  display: block;
+    display: -webkit-box;    
+    -webkit-line-clamp: 2;
+    line-height:1.2em;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.long-text-nor{
+  line-height:1.2em;  
+}
+
+/* Chip using padding*/
+.chip-outline {
+  display: inline-block;
+  padding: 0 6px;
+  height: 25px;
+  font-size: 13px;
+  line-height: 20px;
+  border-radius: 25px;
+  border: 2px solid grey;
+  /*background-color: #f1f1f1;*/
+}
+
+
+
+/* ================================================= */
+/* -------------- Scrolling Handling --------------- */
+/* Link : https://stackoverflow.com/questions/47505426/html-horizontal-scrollbar-for-card-divs */
+
+
+
+.circular {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+ 
+}
+
+
+.row-scroll{
+  align-items: stretch;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+
+.card-scroll {
+  /*float: left;*/  
+  padding: .40rem;
+  /*margin-bottom: .75rem;*/
+  border: 0;  
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.card-scroll > img {
+  margin-bottom: .1rem;
+}
+
+.card-scroll-text {
+  font-size: 85%;
+}
+
+/* ================================================= */
+
+/* ================================================= */
+
+
+
+/* ================================================= */

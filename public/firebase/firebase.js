@@ -16,6 +16,7 @@ const config = {
 firebase.initializeApp(config);
 let firestore = firebase.firestore();
 let db = firebase.firestore();
+let db_real = firebase.database();
 let storage  = firebase.storage();
 let auth = firebase.auth();
 //var functions = firebase.functions();

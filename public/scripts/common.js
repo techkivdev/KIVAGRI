@@ -11,16 +11,41 @@
 var toastHeader = ''
 var toastBody = ''
 
+var project_name = 'PROJECT'
+
 //---- PATH Details --------------
 function getFirestorePath(key) {
 
   var firestorepath = {
     BASEPATH : 'DATABASE',
-    PROJECT : 'DATABASE/PROJECT',
-    DEVICE : 'DATABASE/PROJECT/DEVICE'
+    PROJECT : 'DATABASE/' + project_name,
+    DEVICE : 'DATABASE/'+project_name+'/DEVICE',
+    DEVICE_SAMPLE : 'DATABASE/'+project_name+'/DEVICESAMPLE',
+    DEVICE_ANALYSIS : 'DATABASE/'+project_name+'/DEVICEANALYSIS'
   }
 
   return firestorepath[key]
+
+}
+
+// Get Hardware Config Details
+function getHardwareConfigDetails() {
+ 
+  let CONTROL_STATUS = {
+    0 : "ACTIVE STATUS",
+    1 : "REAL TIME UPDATE STATUS",
+    2 : "FUNCTION HANDLING STATUS",
+    3 : "DEVICE FREEZ",
+    4 : "DEVICE RISK",
+    5 : "ONE TIME OPERATION",
+    6 : "DEVICE RESTART",
+    7 : "FIREBASE UPDATE",
+    8 : "UPDATE CONTROL",
+    9 : "UPDATE DOUTPIN",
+    10 : "RE INIT DATA"
+  }
+
+  return CONTROL_STATUS
 
 }
 
@@ -172,6 +197,101 @@ function deleteDocument(path,message) {
   db.doc(path).delete().then(function() { 
     if(message != 'NA') {toastMsg(message);}
   }); 
+
+}
+
+// Get Current Time
+function getCurrentTime() {
+
+  var today = new Date();
+
+  return today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+}
+
+
+// Get Current Date
+function getTodayDate() {
+
+  var month = new Array();
+  month[0] = "January";
+  month[1] = "February";
+  month[2] = "March";
+  month[3] = "April";
+  month[4] = "May";
+  month[5] = "June";
+  month[6] = "July";
+  month[7] = "August";
+  month[8] = "September";
+  month[9] = "October";
+  month[10] = "November";
+  month[11] = "December";
+
+  var today = new Date();
+  var date = month[today.getMonth()] + ' ' + today.getDate() + ', ' + today.getFullYear();
+
+  return date
+}
+
+
+function getTodayDateList() {
+
+  var month = new Array();
+  month[0] = "January";
+  month[1] = "February";
+  month[2] = "March";
+  month[3] = "April";
+  month[4] = "May";
+  month[5] = "June";
+  month[6] = "July";
+  month[7] = "August";
+  month[8] = "September";
+  month[9] = "October";
+  month[10] = "November";
+  month[11] = "December";
+
+  var today = new Date();
+  var date = [month[today.getMonth()] , today.getDate() , today.getFullYear()];  
+
+  return date
+}
+
+
+// Create Command
+function getCommand(deviceip,devicename,mode,option,parameter) {
+
+  // http://192.168.1.20/KIV&MODE=COLLECT:OPTION=OPTION:PARAMETER=PARAMETERS&
+
+  let url = 'http://'+deviceip+'/KIV&PROJECT='+project_name+':DEVICE='+devicename+':MODE='+mode+':OPTION='+option+':PARAMETER='+parameter+'&'
+
+  return url
+
+
+}
+
+// Create fetch request.
+async function getURLData(myUrl) {
+
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  // 10 second timeout:
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  let response = await fetch(myUrl , {signal});
+
+  if(response.ok) {
+      let data = await response.json()
+      return data;
+  } else {
+      throw Error(response.statusText);
+  }
+
+
+ // await fetch('https://jsonplaceholder.typicode.com/todos/1')
+//.then(response => response.json())
+//.then(json => console.log(json))
+
 
 }
 

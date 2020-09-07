@@ -32,10 +32,11 @@ function createAnalogGUIComponent(allPinDetails) {
            analog_guages_lines += '\
             <div class="card align-items-center col" style="margin-left: 10px; width: 20rem;">\
               <div class="card-body text-center">\
-                <h4 class="card-title">'+eachkey+'</h4>\
+                <h6 class="card-title">'+eachkey+'</h6>\
                 <h6 class="card-subtitle mb-2 text-muted">'+eachpindata['NAME']+'</h6>\
+                <h4 class="card-subtitle mb-2 text-muted" id="analog_'+eachkey+'_value_section" style="margin-top : 20px;">1.234</h4>\
                 <div>\
-                  <b id="analog_'+eachkey+'_value_field" style="font-size : 30px;"></b>\
+                  <b id="analog_'+eachkey+'_value_field" style="font-size : 30px; display : none;"></b>\
                   <canvas id="analog_'+eachkey+'_canvas"></canvas>\
                 </div>\
                 <a href="#!" id="'+eachkey+'_moreoption" onclick="openAnalogDeviceIDOptions(\'' + eachkey + '\')" class="card-link">More</a>\
@@ -150,6 +151,8 @@ function updateAnalogValue(allPinDetails,data)
         if(eachpindata['TYPE'] == "ANALOG" && eachpindata['STATUS'] == 'TRUE') 
         {
             let value = data[eachkey]
+            setHTML('analog_'+eachkey+'_value_section',value)
+           // println(value)
             gaugeIDDetails[eachkey].set(value)
         }
     }

@@ -8,14 +8,25 @@
 
 
 // Get All PIN Configuration Set
-function getAllPINConfig() {
+function getAllPINConfig(activeconfig) {
 
   let allPINConfigSet = {}
+
+  let analog_active_config = activeconfig.split(',')[0]
+  let digiin_active_config = activeconfig.split(',')[1]
+  let digiout_active_config = activeconfig.split(',')[2]
+  let calib_active_config = activeconfig.split(',')[3]
 
   // Analog Pins
   var i;
   for (i = 0; i < 16; i++) {
     let AID = "AID" + i
+
+    // Update Status
+    let status = "FALSE"
+    if( (analog_active_config > 0 ) && (i <= analog_active_config) ) {
+      status = "TRUE"
+    }
 
     allPINConfigSet[AID] = {
             ID : AID,
@@ -23,13 +34,16 @@ function getAllPINConfig() {
             DESC : AID + " Short Desc",
             TYPE : "ANALOG",
             PIN : i.toString(),
-            STATUS : "FALSE",
+            STATUS : status,
             INITVALUE : "0",
             MINVALUE : "0",
             MAXVALUE : "250",
             CONFACTOR : "1",
-            CNGFACTOR : "10",
-            EXTRA : "0,100,200,250#G,Y,R"
+            CNGFACTOR : "0",
+            EXTRA : "0,100,200,250#G,Y,R",
+            ALERTMODE : "NONE", // Range Check, Control DOUT, Notification, Start Operation
+            ALERTRANGE : "0,250",
+            ALERTOPTION : "NA"
           }
 
   }
@@ -38,19 +52,28 @@ function getAllPINConfig() {
   for (i = 0; i < 16; i++) {
     let DINID = "DINID" + i
 
+    // Update Status
+    let status = "FALSE"
+    if( (digiin_active_config > 0 ) && (i <= digiin_active_config) ) {
+      status = "TRUE"
+    }
+
     allPINConfigSet[DINID] = {
             ID : DINID,
             NAME : DINID + " Name",
             DESC : DINID + " Short Desc",
             TYPE : "DIGITALIN",
             PIN : i.toString(),
-            STATUS : "FALSE",
+            STATUS : status,
             INITVALUE : "0",
             MINVALUE : "0",
             MAXVALUE : "1",
             CONFACTOR : "1",
             CNGFACTOR : "1",
-            EXTRA : "NA"
+            EXTRA : "NA",
+            ALERTMODE : "NONE", // Range Check, Control DOUT, Notification, Start Operation
+            ALERTRANGE : "0,250",
+            ALERTOPTION : "NA"
           }
 
   }
@@ -59,6 +82,12 @@ function getAllPINConfig() {
     // Digital Output
     for (i = 0; i < 16; i++) {
       let DOUTID = "DOUTID" + i
+
+      // Update Status
+    let status = "FALSE"
+    if( (digiout_active_config > 0 ) &&  ( i <= digiout_active_config) ) {
+      status = "TRUE"
+    }
   
       allPINConfigSet[DOUTID] = {
               ID : DOUTID,
@@ -66,13 +95,16 @@ function getAllPINConfig() {
               DESC : DOUTID + " Short Desc",
               TYPE : "DIGITALOUT",
               PIN : i.toString(),
-              STATUS : "FALSE",
+              STATUS : status,
               INITVALUE : "0",
               MINVALUE : "0",
               MAXVALUE : "1",
               CONFACTOR : "1",
               CNGFACTOR : "1",
-              EXTRA : "NA"
+              EXTRA : "NA",
+              ALERTMODE : "NONE", // Range Check, Control DOUT, Notification, Start Operation
+              ALERTRANGE : "0,250",
+              ALERTOPTION : "NA"
             }
   
     }

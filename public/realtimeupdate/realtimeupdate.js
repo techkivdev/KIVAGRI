@@ -105,7 +105,9 @@ function readRealAnalogTimeData() {
         realTimeAnalogData = snapshot.val()
         //println(realTimeAnalogData)
         // Update Analog Section   
-        updateAnalogValue(devicePinConfig,realTimeAnalogData)
+        if(realTimeAnalogData != null) {
+            updateAnalogValue(devicePinConfig,realTimeAnalogData)
+        }
 
     });
 }
@@ -117,8 +119,10 @@ function readRealDigiINTimeData() {
     dbRealRef.on('value', function(snapshot) {
         realTimeDigiINData = snapshot.val()
         //println(realTimeDigiINData)
-        // Update Analog Section   
-        updateDigitalInput(devicePinConfig,realTimeDigiINData)
+        // Update Analog Section  
+        if(realTimeDigiINData != null) { 
+           updateDigitalInput(devicePinConfig,realTimeDigiINData)
+        }
 
     });
 }
@@ -130,8 +134,10 @@ function readRealDigiOUTTimeData() {
     dbRealRef.on('value', function(snapshot) {
         realTimeDigiOUTData = snapshot.val()
         //println(realTimeDigiOUTData)
-        // Update Analog Section   
-        updateDigitalOutput(devicePinConfig,realTimeDigiOUTData)
+        // Update Analog Section  
+        if(realTimeDigiOUTData != null) { 
+          updateDigitalOutput(devicePinConfig,realTimeDigiOUTData)
+        }
 
     });
 }
@@ -159,6 +165,10 @@ function updateGUIComponent()
 
     readRealDigiOUTTimeData()
 
+    readRealTimeInfoDetails()
+
+    readDeviceStatusDetails()
+
 
 }
 
@@ -166,7 +176,6 @@ function updateGUIComponent()
 // -------------------------------------------
 // Update HTML Page
 // -------------------------------------------
-
 function updateHTMLPage()
 {
     
@@ -383,6 +392,99 @@ function controlDigitalOUTStatus(details) {
     } else {
         println("Request Already Sent ....")
     }
+
+}
+
+// ---------------------------------------------------
+// Status Hanling
+
+// Refresh Status
+var realtimeinfodetails = {}
+var controlStatusClickBtnStatus = false
+function readRealTimeInfoDetails() {
+    var dbRealRef = db_real.ref(project_name + '/DEVICE/' + DEVICE + '/REALTIMESAMPLE/INFO');
+    dbRealRef.on('value', function(snapshot) {
+        //println('Real Time Info Updated !!')
+        realtimeinfodetails = snapshot.val()
+        // Object.keys(realtimeinfodetails).length > 0
+        if(realtimeinfodetails != null) {
+            updateRealTimeInfoDetails()
+        }       
+
+    });
+}
+
+// Device Status
+var deviceStatusDetails = {}
+function readDeviceStatusDetails() {
+    var dbRealRef = db_real.ref(project_name + '/DEVICE/' + DEVICE + '/DEVICESTATUS');
+    dbRealRef.on('value', function(snapshot) {
+        println('Device Status Details !!')
+        deviceStatusDetails = snapshot.val()
+        // Object.keys(realtimeinfodetails).length > 0
+        if(deviceStatusDetails != null) {
+            setHTML('device_details_devicestatus','Device Status :  ' + deviceStatusDetails['CURRENT'])
+        }       
+
+    });
+}
+
+// Update Real Time Info Details
+function updateRealTimeInfoDetails() 
+{
+    //println(realtimeinfodetails)
+
+    // Check Status
+    if(realtimeinfodetails["ACTIVESTATUS"]) {
+        setHTML('device_details_realtimestatus','Real Time Mode is : Active')
+        setHTML('device_details_realtimestatuscontrolssec','<a href="#" onclick="realTimeStatusHandling(\'' + 'FALSE' +  '\')" class="btn btn-primary">De-Activate</a>')
+    } else {
+        setHTML('device_details_realtimestatus','Real Time Mode is : Not Active')
+        setHTML('device_details_realtimestatuscontrolssec','<a href="#" onclick="realTimeStatusHandling(\'' + 'TRUE' +  '\')" class="btn btn-primary">Activate</a>')
+    }
+
+    // Update Counter Value
+    setHTML('device_details_realtimecount','Counter : ' + realtimeinfodetails["COUNT"].toString())
+
+    setHTML('device_details_realtimestatuscontrolstatus','<h6>Connected</h6>')
+    controlStatusClickBtnStatus = false
+
+}
+
+// Real Time Status Handling
+function realTimeStatusHandling(status) 
+{
+    //println(status)
+
+    // Send Command to hardware
+    let mode = 'CONTROL_STATUS'
+    let option = 'REALTIME'
+    let parameter = status
+    let cmdUrl = getCommand(deviceData['ADDRESS'],DEVICE,mode,option,parameter)
+
+    println(cmdUrl)  
+    setHTML('device_details_realtimestatuscontrolstatus','<h6>Please Wait ...</h6>')
+    
+    if(!controlStatusClickBtnStatus) {
+
+        controlStatusClickBtnStatus = true
+        
+        getURLData(cmdUrl).then(data => {       
+            println("SUCCESS!!")
+            setHTML('device_details_realtimestatuscontrolstatus','<h6>SUCCESS!!</h6>')
+            println(data)
+            controlStatusClickBtnStatus = false
+        }).catch(function(error) {
+            println("FAILED !!")
+            setHTML('device_details_realtimestatuscontrolstatus','<h6>FAILED!!</h6>')
+            println(error);  
+            controlStatusClickBtnStatus = false          
+        });
+
+    } else {
+        println('Already In-Progress !!')
+    }
+    
 
 }
 

@@ -4,6 +4,7 @@
   <title>Real Time Update</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
  
   <!-- CSS only -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
@@ -47,7 +48,10 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" data-toggle="pill" href="#device_calib">Calibration</a>
-      </li>  
+      </li> 
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="pill" href="#device_details">Details</a>
+      </li> 
     </ul>
 
     <!-- Tab panes -->
@@ -80,18 +84,49 @@
 
    </div>
 
-      <!-- Calibration -->
-      <div class="tab-pane container fade" id="device_calib">
+    <!-- Calibration -->
+    <div class="tab-pane container fade" id="device_calib">
 
-            <div class="card" style="margin-top: 20px;">
-              <div class="card-body">
-            <div id="calibsection">
-              <!-- Calib Section -->
-            </div> 
-          </div>
-        </div>       
+          <div class="card" style="margin-top: 20px;">
+            <div class="card-body">
+          <div id="calibsection">
+            <!-- Calib Section -->
+          </div> 
+        </div>
+      </div>       
 
+    </div>
+
+  <!-- Details -->
+  <div class="tab-pane container fade" id="device_details">
+
+    <div class="card" style="margin-top: 20px;">
+      <div class="card-header">
+        Real Time Status
       </div>
+      <div class="card-body">
+        <h5 class="card-title" id="device_details_devicestatus">Device Status : </h5>
+        <h5 class="card-title" id="device_details_realtimestatus">Real Time Mode is : Active</h5>
+        <div class="card-text">
+          <p id="device_details_realtimecount">Counter : 0</p>
+          <p>You Can Refresh Status and also update status.</p>
+        </div>
+        
+        <!-- <a href="#" onclick="refershDeviceStatus()" class="btn btn-primary">Refresh Status</a> -->
+        <div id="device_details_realtimestatuscontrolssec">
+           <!-- Script Code -->
+        </div>
+
+        <div id="device_details_realtimestatuscontrolstatus" style="margin-top: 10px;">
+          <!-- Script Code -->
+       </div>
+
+        
+      </div>
+    </div>      
+
+  </div>
+
 
    </div>
 

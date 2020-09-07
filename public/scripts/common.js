@@ -11,7 +11,9 @@
 var toastHeader = ''
 var toastBody = ''
 
-var project_name = 'PROJECT'
+// ---------------------------------------------
+var project_name = 'KIVAGRI'
+// ---------------------------------------------
 
 //---- PATH Details --------------
 function getFirestorePath(key) {
@@ -20,8 +22,8 @@ function getFirestorePath(key) {
     BASEPATH : 'DATABASE',
     PROJECT : 'DATABASE/' + project_name,
     DEVICE : 'DATABASE/'+project_name+'/DEVICE',
-    DEVICE_SAMPLE : 'DATABASE/'+project_name+'/DEVICESAMPLE',
-    DEVICE_ANALYSIS : 'DATABASE/'+project_name+'/DEVICEANALYSIS'
+    DEVICESAMPLE : 'DATABASE/'+project_name+'/DEVICESAMPLE',
+    DEVICEANALYSIS : 'DATABASE/'+project_name+'/DEVICEANALYSIS'
   }
 
   return firestorepath[key]
@@ -42,7 +44,8 @@ function getHardwareConfigDetails() {
     7 : "FIREBASE UPDATE",
     8 : "UPDATE CONTROL",
     9 : "UPDATE DOUTPIN",
-    10 : "RE INIT DATA"
+    10 : "UPDATE STATUS",
+    11 : "DEEP SLEEP STATUS"
   }
 
   return CONTROL_STATUS
@@ -279,6 +282,7 @@ async function getURLData(myUrl) {
   const timeoutId = setTimeout(() => controller.abort(), 10000);
 
   let response = await fetch(myUrl , {signal});
+  println(response)
 
   if(response.ok) {
       let data = await response.json()

@@ -132,7 +132,7 @@ function getDeviceHomeTabsDetails (ID) {
          \
          <div class="form-group">\
           <label for="'+ID+'_devicename">Name</label>\
-          <input type="text" class="form-control" id="'+ID+'_devicename" value="'+eachDeviceData['NAME']+'">\
+          <input disabled type="text" class="form-control" id="'+ID+'_devicename" value="'+eachDeviceData['NAME']+'">\
         </div>\
 \
         <div class="form-group">\
@@ -163,7 +163,7 @@ function getDeviceHomeTabsDetails (ID) {
    </div>\
    \
    <div class="form-group">\
-   <label for="'+ID+'_deviceenable">Active Status</label>\
+   <label for="'+ID+'_deviceenable">Device Active Status</label>\
    <select class="form-control" id="'+ID+'_deviceenable">'
      
    selectline = ''        
@@ -224,6 +224,43 @@ function getDeviceHomeTabsDetails (ID) {
     each_device_tabs_lines +=  selectline +'</select>\
   </div>\
 \
+    <div class="form-group">\
+    <label for="'+ID+'_deviceserverhandling">Server Handling</label>\
+    <select class="form-control" id="'+ID+'_deviceserverhandling">'
+    
+    selectline = ''        
+    if(eachDeviceData['SERVERHANDLING'] == 'TRUE') {selectline = '<option selected>TRUE</option><option >FALSE</option>'} else { selectline = '<option >TRUE</option><option selected>FALSE</option>' }
+
+    each_device_tabs_lines +=  selectline +'</select>\
+    </div>\
+    \
+    <div class="form-group">\
+    <label for="'+ID+'_deviceserverfcnmode">Server Function Mode</label>\
+    <select class="form-control" id="'+ID+'_deviceserverfcnmode">'
+
+    selectline = ''
+    checkwith = ''
+
+    checkwith = 'MODE1'
+    if(eachDeviceData['SERVERCNTFCNMODE'] == checkwith) {selectline += '<option selected>'+checkwith+'</option>'} else { selectline += ' <option>'+checkwith+'</option>' }
+    checkwith = 'MODE2'
+    if(eachDeviceData['SERVERCNTFCNMODE'] == checkwith) {selectline += '<option selected>'+checkwith+'</option>'} else { selectline += ' <option>'+checkwith+'</option>' }
+    checkwith = 'MODE3'
+    if(eachDeviceData['SERVERCNTFCNMODE'] == checkwith) {selectline += '<option selected>'+checkwith+'</option>'} else { selectline += ' <option>'+checkwith+'</option>' }
+     
+    each_device_tabs_lines +=  selectline +'</select>\
+  </div>\
+  \
+    <div class="form-group">\
+    <label for="'+ID+'_deviceactiveconfig">Active Configuration</label>\
+    <input type="text" class="form-control" id="'+ID+'_deviceactiveconfig" value="'+eachDeviceData['ACTIVECONFIG']+'">\
+    </div>\
+    \
+    <div class="form-group">\
+    <label for="'+ID+'_devicecollectiontime">Collection Time (In Second)</label>\
+    <input type="text" class="form-control" id="'+ID+'_devicecollectiontime" value="'+eachDeviceData['COLLECTIONTIME']+'">\
+    </div>\
+    \
         <div class="form-group" style="margin-top: 20px;">\
         <button onclick="updateEachDeviceDetails(\'' + ID + '\')" id="'+ID+'_deviceupdatebtn" class="btn btn-success float-right">UPDATE</button>\
         </div>\
@@ -254,7 +291,7 @@ function getDeviceOptionTabsDetails (ID) {
           <div class="card-body">\
              <h6>Sync Device Data</h6>\
              <div class="form-group" style="margin-top: 20px;">\
-              <button onclick="syncDeviceDataConfig(\'' + ID + '\')" id="'+ID+'_devicetestexection" class="btn btn-primary">SYNC</button>\
+              <button onclick="syncDeviceDataConfig(\'' + ID + '\')" id="'+ID+'_devicetestexection" class="btn btn-primary">SYNC & UPDATE</button>\
              </div>\
             <div id="'+ID+'_devicecurrentsyncid" style="margin-top : 30px;"><p>Sync Status</p></div>\
             </div></div>'
@@ -268,12 +305,22 @@ function getDeviceOptionTabsDetails (ID) {
 function getDeviceControlTabsDetails (ID) {
 
     let eachDeviceData = allDevicesData[ID]
+
+    let linestatus = 'Activate'
+    if( eachDeviceData['ENABLE'] == 'TRUE') {
+        linestatus = 'De-Activate'
+    }
+
     let each_device_tabs_lines = '<br>\
     <div class="card">\
       <div class="card-body">\
-         <h4>'+ID+' Control</h4>\
-         \
-         \
+         <h6>Device Status : ' + eachDeviceData['ENABLE'] + '</h6>\
+         <p>Enable and Disable DEVICE.</p>\
+         <div class="form-group" style="margin-top: 20px;">\
+          <button onclick="controlDeviceActivationStatus(\'' + ID+'#TRUE' + '\')" id="'+ID+'_controldeviceactivationstatus" class="btn btn-primary">ENABLE</button>\
+          <button onclick="controlDeviceActivationStatus(\'' + ID+'#FALSE' + '\')" id="'+ID+'_controldeviceactivationstatus" class="btn btn-warning">DISABLE</button>\
+          <div id="'+ID+'_controldeviceactivationstatusresult"></div>\
+        </div>\
         </div></div>'
 
 
@@ -405,7 +452,12 @@ function updateDetailsSection(mode,jsonData)
                 let avalue = value[idx]
                 let ID = getArrayIDDetails(mode,idx)
                 if(ID != 'NA') {
-                   arrayline += '<li><b>' + ID + ' : </b>' + avalue + '</li>'
+                    if(avalue) {
+                        arrayline += '<li><b>' + ID + ' : ' + avalue + '</b></li>'
+                    } else {
+                        arrayline += '<li>' + ID + ' :  ' + avalue + '</li>'
+                    }
+                   
                 }
             }
 
@@ -512,6 +564,12 @@ function startTestExecution() {
     result_line += 'START...\n'
     setHTMLValue('deviceCommandResultModal',result_line)
 
+    /*
+     Solution For Mixed Content :
+      https://stackoverflow.com/questions/18327314/how-to-allow-http-content-within-an-iframe-on-a-https-site
+      https://thehackernews.com/2015/04/disable-mixed-content-warning.html
+    */
+
     getURLData(cmdUrl).then(data => {
 
         updateDetailsSection(mode,data)
@@ -562,9 +620,7 @@ async function syncDeviceDataConfig(ID) {
         println('No such document!');
     } else {
         currentDeviceCalibData = calibdoc.data()      
-    }
-
-    setHTML(ID+"_devicecurrentsyncid","<p>Current Sync Device ID : " + currentDeviceID+"</p>")
+    }    
 
     updatePinConfigSection(ID)
     updateCalibSection(ID)
@@ -574,9 +630,86 @@ async function syncDeviceDataConfig(ID) {
     println(currentDevicePinConfigData)
     println(currentDeviceCalibData)
 
+    // Find Active Status Configuration Details
+    let analogLastPinNumber = 0
+    let digiinLastPinNumber = 0
+    let digioutLastPinNumber = 0
+    for(eachkey in currentDevicePinConfigData) {
+        let eachData = currentDevicePinConfigData[eachkey]
+
+        if((eachData.TYPE == 'ANALOG') && (eachData.STATUS == 'TRUE')) {
+            analogLastPinNumber = eachData.PIN
+        }
+
+        if((eachData.TYPE == 'DIGITALIN') && (eachData.STATUS == 'TRUE')) {
+            digiinLastPinNumber = eachData.PIN
+        }
+
+        if((eachData.TYPE == 'DIGITALOUT') && (eachData.STATUS == 'TRUE')) {
+            digioutLastPinNumber = eachData.PIN
+        }
+    }
+
+    // Update According to Projects
+    let calibActivieNumber = 0
+
+    let completeStatus = analogLastPinNumber + ',' + digiinLastPinNumber + ',' + digioutLastPinNumber + ',' + calibActivieNumber
+
+    setHTML(ID+"_devicecurrentsyncid","<p>Current Sync Device ID : " + currentDeviceID+"</p><br><p>Active Status : " + completeStatus)
+
+    /*
+    await db_real.ref(project_name + '/DEVICE/' + currentDeviceID + '/DATA/PINACTIVESTATUS').set({
+        ACTIVE : completeStatus
+    }).then(function() {
+        println(devicename + ' : SYNC Status Updated !!')
+    });
+    */
+
     hidePleaseWait()
 
 
+
+}
+
+// Update Device Activation Status
+async function controlDeviceActivationStatus(details) {
+
+    let ID = details.split('#')[0]
+    let status = details.split('#')[1]
+    println(ID)
+
+    let eachDeviceData = allDevicesData[ID]
+
+    println(status)
+
+    // Send Command to hardware
+    let mode = 'CONTROL_STATUS'
+    let option = 'ACTIVE'
+    let parameter = status
+    let cmdUrl = getCommand(eachDeviceData['ADDRESS'],ID,mode,option,parameter)
+
+    println(cmdUrl)
+
+    //showPleaseWait()
+
+    setHTML(ID+'_controldeviceactivationstatusresult','<h6>Please Wait ...</h6>')
+        
+    getURLData(cmdUrl).then(data => {       
+        println("SUCCESS!!")
+        println(data)
+
+        setHTML(ID+'_controldeviceactivationstatusresult','<h6>SUCCESS !! - Please Refersh Page.</h6>')
+
+        //hidePleaseWait()
+
+    }).catch(function(error) {
+        println("FAILED !!")
+        println(error)  
+
+        setHTML(ID+'_controldeviceactivationstatusresult','<h6>FAILED !! - Please Refersh Page.</h6>')
+        
+        //hidePleaseWait()
+    });
 
 }
 
@@ -674,6 +807,23 @@ function updateDevicePinConfig(ID) {
         <input type="text" class="form-control" id="'+ID + '_' +devicepinconfigid+ '_pinconfigextra" value="'+eachDeviceConfig['EXTRA']+'">\
         </div>'
 
+        eachPinDetails += ' <div class="col-sm-12 form-group">\
+        <label for="'+ID+ '_' +devicepinconfigid+ '_pinconfigalertmode">Alert Mode : NONE, NOTIF , CDOUT</label>\
+        <input type="text" class="form-control" id="'+ID + '_' +devicepinconfigid+ '_pinconfigalertmode" value="'+eachDeviceConfig['ALERTMODE']+'" onkeyup="this.value = this.value.toUpperCase();">\
+        </div>'
+
+        eachPinDetails += ' <div class="col-sm-12 form-group">\
+        <label for="'+ID+ '_' +devicepinconfigid+ '_pinconfigalertrange">Alert Range (MIN,MAX)</label>\
+        <input type="text" class="form-control" id="'+ID + '_' +devicepinconfigid+ '_pinconfigalertrange" value="'+eachDeviceConfig['ALERTRANGE']+'">\
+        </div>'
+
+        eachPinDetails += ' <div class="col-sm-12 form-group">\
+        <label for="'+ID+ '_' +devicepinconfigid+ '_pinconfigalertoptions">Alert Options</label>\
+        <input type="text" class="form-control" id="'+ID + '_' +devicepinconfigid+ '_pinconfigalertoptions" value="'+eachDeviceConfig['ALERTOPTION']+'" onkeyup="this.value = this.value.toUpperCase();">\
+        </div>'
+
+
+        // ------------ Button ----------------
         eachPinDetails += ' <div class="col-sm-12 form-group" style="margin-top: 10px;">\
         <button onclick="saveDevicePinConfig(\'' + ID + '#' + devicepinconfigid + '\')" id="'+ID + '_' +devicepinconfigid+ '_pinconfigsave" class="btn btn-success float-right">SAVE</button>\
         <button onclick="viewallDevicePinConfig(\'' + ID + '#' + eachDeviceConfig['TYPE'] + '\')" id="'+ID + '_' +devicepinconfigid+ '_pinconfigviewall" class="btn btn-info float-right" style="margin-right : 20px;">VIEW ALL</button>\
@@ -826,10 +976,16 @@ async function addNewDevice() {
         validateInput = false  
     }
 
+    var deviceactiveconfig = getHTMLValue("deviceactiveconfig");
+    if(isEmpty(deviceactiveconfig)) {
+        validateInput = false  
+    }
+
     if(validateInput) {
 
         println(devicename)
         println(deviceaddress)
+        println(deviceactiveconfig)
 
          // Update Database
          let dbData = {}
@@ -843,6 +999,11 @@ async function addNewDevice() {
          dbData['REALTIMEMAXLIMIT'] = '10'     
          dbData['DEVICEFCNSTATUS'] = 'FALSE'  
          dbData['DEVICEFCNMODE'] = 'MODE1'
+
+         dbData['ACTIVECONFIG'] = deviceactiveconfig //Pin Configuration - Analog, DigitalIN, DigitalOUT, Calib
+         dbData['SERVERHANDLING'] = 'FALSE'
+         dbData['SERVERCNTFCNMODE'] = 'MODE1'
+         dbData['COLLECTIONTIME'] = '15'
          
 
          showPleaseWait()
@@ -872,11 +1033,13 @@ async function addNewDevice() {
                 println(devicename + ' : Realtime INFO Added')
             });
 
+            /*
             await db_real.ref(project_name + '/DEVICE/' + devicename + '/SYNCSTATUS').set({
                 ACTIVE : false
             }).then(function() {
                 println(devicename + ' : Realtime SYNC STATUS Added')
             });
+            */
 
             await db_real.ref(project_name + '/DEVICE/' + devicename + '/REALTIMESAMPLE/INFO').set({
                 ACTIVESTATUS : false,
@@ -887,14 +1050,14 @@ async function addNewDevice() {
             });
 
             await db_real.ref(project_name + '/DEVICE/' + devicename + '/CONTROL').set({
-                INFO : 'DOUT'
+                INFO : 'DIGITALOUT'
             }).then(function() {
                 println(devicename + ' : Realtime CONTROL')
             });
 
 
             // Collect PIN DATA and Update
-            let pinConfigDetails = getAllPINConfig()
+            let pinConfigDetails = getAllPINConfig(deviceactiveconfig)
 
             // Set Main Device Document
             await db.collection(getFirestorePath('DEVICE') + "/" + devicename + "/DATA").doc("PINCONFIG").set(pinConfigDetails).then(function() {        
@@ -964,7 +1127,11 @@ async function updateEachDeviceDetails(key) {
     var realtimemaxlimit = getHTMLValue(key + "_realtimemaxlimit");
     var devicefcnStatus = getHTMLValue(key + "_devicefcnStatus");
     var devicefcnmode = getHTMLValue(key + "_devicefcnmode");
-   
+
+    var deviceserverhandling = getHTMLValue(key + "_deviceserverhandling");
+    var deviceserverfcnmode = getHTMLValue(key + "_deviceserverfcnmode");
+    var deviceactiveconfig = getHTMLValue(key + "_deviceactiveconfig");
+    var devicecollectiontime = getHTMLValue(key + "_devicecollectiontime");
 
     if(validateInput) {
 
@@ -987,6 +1154,11 @@ async function updateEachDeviceDetails(key) {
          dbData['REALTIMEMAXLIMIT'] = realtimemaxlimit  
          dbData['DEVICEFCNSTATUS'] = devicefcnStatus  
          dbData['DEVICEFCNMODE'] = devicefcnmode
+
+         dbData['ACTIVECONFIG'] = deviceactiveconfig
+         dbData['SERVERHANDLING'] = deviceserverhandling
+         dbData['SERVERCNTFCNMODE'] = deviceserverfcnmode
+         dbData['COLLECTIONTIME'] = devicecollectiontime
  
          
          showPleaseWait()
@@ -1073,6 +1245,9 @@ async function saveDevicePinConfig(details) {
      currentDevicePinConfigData[details.split('#')[1]]['CONFACTOR'] = getHTMLValue(details.replace('#','_',) + "_pinconfigconfactor");
      currentDevicePinConfigData[details.split('#')[1]]['CNGFACTOR'] = getHTMLValue(details.replace('#','_',) + "_pinconfigcngfactor");
      currentDevicePinConfigData[details.split('#')[1]]['EXTRA'] = getHTMLValue(details.replace('#','_',) + "_pinconfigextra");
+     currentDevicePinConfigData[details.split('#')[1]]['ALERTMODE'] = getHTMLValue(details.replace('#','_',) + "_pinconfigalertmode");
+     currentDevicePinConfigData[details.split('#')[1]]['ALERTRANGE'] = getHTMLValue(details.replace('#','_',) + "_pinconfigalertrange");
+     currentDevicePinConfigData[details.split('#')[1]]['ALERTOPTION'] = getHTMLValue(details.replace('#','_',) + "_pinconfigalertoptions");
 
 
      // Set Main Device Document

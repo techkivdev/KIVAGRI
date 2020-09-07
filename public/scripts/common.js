@@ -23,7 +23,9 @@ function getFirestorePath(key) {
     PROJECT : 'DATABASE/' + project_name,
     DEVICE : 'DATABASE/'+project_name+'/DEVICE',
     DEVICESAMPLE : 'DATABASE/'+project_name+'/DEVICESAMPLE',
-    DEVICEANALYSIS : 'DATABASE/'+project_name+'/DEVICEANALYSIS'
+    DEVICESAMPLEFAILED : 'DATABASE/'+project_name+'/DEVICESAMPLEFAILED',
+    DEVICEANALYSIS : 'DATABASE/'+project_name+'/DEVICEANALYSIS',
+    DEVICEANALYSISFAILED : 'DATABASE/'+project_name+'/DEVICEANALYSISFAILED'
   }
 
   return firestorepath[key]
@@ -42,7 +44,7 @@ function getHardwareConfigDetails() {
     5 : "ONE TIME OPERATION",
     6 : "DEVICE RESTART",
     7 : "FIREBASE UPDATE",
-    8 : "UPDATE CONTROL",
+    8 : "UPDATE DOUT STATUS ON DB",
     9 : "UPDATE DOUTPIN",
     10 : "UPDATE STATUS",
     11 : "DEEP SLEEP STATUS"
@@ -297,6 +299,17 @@ async function getURLData(myUrl) {
 //.then(json => console.log(json))
 
 
+}
+
+
+// Provide Delay
+
+function delay(delayInms) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(2);
+    }, delayInms);
+  });
 }
 
 

@@ -261,6 +261,16 @@ function getDeviceHomeTabsDetails (ID) {
     <input type="text" class="form-control" id="'+ID+'_devicecollectiontime" value="'+eachDeviceData['COLLECTIONTIME']+'">\
     </div>\
     \
+    <div class="form-group">\
+    <label for="'+ID+'_devicupdatedoutstatus">Update DOUT Status on DB</label>\
+    <select class="form-control" id="'+ID+'_devicupdatedoutstatus">'
+    
+    selectline = ''        
+    if(eachDeviceData['UPDATEDOUTSTATUS'] == 'TRUE') {selectline = '<option selected>TRUE</option><option >FALSE</option>'} else { selectline = '<option >TRUE</option><option selected>FALSE</option>' }
+
+    each_device_tabs_lines +=  selectline +'</select>\
+    </div>\
+    \
         <div class="form-group" style="margin-top: 20px;">\
         <button onclick="updateEachDeviceDetails(\'' + ID + '\')" id="'+ID+'_deviceupdatebtn" class="btn btn-success float-right">UPDATE</button>\
         </div>\
@@ -315,13 +325,35 @@ function getDeviceControlTabsDetails (ID) {
     <div class="card">\
       <div class="card-body">\
          <h6>Device Status : ' + eachDeviceData['ENABLE'] + '</h6>\
-         <p>Enable and Disable DEVICE.</p>\
+         <p>Enable and Disable DEVICE STATUS</p>\
          <div class="form-group" style="margin-top: 20px;">\
+         <div class="col-sm-12">\
+            <label for="'+ID+'_controldeviceactivationoptions">Select Status Option</label>\
+            <select class="form-control" id="'+ID+'_controldeviceactivationoptions">\
+            <option>NONE</option>\
+            <option>REALTIME</option>\
+            <option>ACTIVE</option>\
+            <option>UPDATEDOUT</option>\
+            </select>\
+        </div>\
+        <div style="margin-top : 20px;">\
           <button onclick="controlDeviceActivationStatus(\'' + ID+'#TRUE' + '\')" id="'+ID+'_controldeviceactivationstatus" class="btn btn-primary">ENABLE</button>\
           <button onclick="controlDeviceActivationStatus(\'' + ID+'#FALSE' + '\')" id="'+ID+'_controldeviceactivationstatus" class="btn btn-warning">DISABLE</button>\
           <div id="'+ID+'_controldeviceactivationstatusresult"></div>\
         </div>\
+        </div>\
         </div></div>'
+
+        each_device_tabs_lines += '<br>\
+        <div class="card">\
+        <div class="card-body">\
+            <p>'+ID+' Current Status :</p>\
+            <div style="margin-top : 20px;">\
+            <button onclick="checkDeviceCurrentStatus(\'' + ID + '\')" id="'+ID+'_checkdevicecurrentstatusbtn" class="btn btn-primary">Check Status</button>\
+            <div id="'+ID+'_checkdevicecurrentstatussection" style="margin-top : 20px;"></div>\
+            </div>\
+            </div>\
+            </div></div>'
 
 
    return each_device_tabs_lines;
@@ -680,37 +712,66 @@ async function controlDeviceActivationStatus(details) {
 
     let eachDeviceData = allDevicesData[ID]
 
+    // Read Option Details
+    var controldeviceactivationoptions = getHTMLValue(ID + "_controldeviceactivationoptions");
+    
+    println(controldeviceactivationoptions)
     println(status)
 
-    // Send Command to hardware
-    let mode = 'CONTROL_STATUS'
-    let option = 'ACTIVE'
-    let parameter = status
-    let cmdUrl = getCommand(eachDeviceData['ADDRESS'],ID,mode,option,parameter)
+    if(controldeviceactivationoptions != 'NONE') {
 
-    println(cmdUrl)
+            // Send Command to hardware
+            let mode = 'CONTROL_STATUS'
+            let option = controldeviceactivationoptions
+            let parameter = status
+            let cmdUrl = getCommand(eachDeviceData['ADDRESS'],ID,mode,option,parameter)
 
-    //showPleaseWait()
+            println(cmdUrl)
 
-    setHTML(ID+'_controldeviceactivationstatusresult','<h6>Please Wait ...</h6>')
-        
-    getURLData(cmdUrl).then(data => {       
-        println("SUCCESS!!")
-        println(data)
+            //showPleaseWait()
 
-        setHTML(ID+'_controldeviceactivationstatusresult','<h6>SUCCESS !! - Please Refersh Page.</h6>')
+            setHTML(ID+'_controldeviceactivationstatusresult','<h6> '+option+' Please Wait ...</h6>')
+                
+            getURLData(cmdUrl).then(data => {       
+                println("SUCCESS!!")
+                println(data)
 
-        //hidePleaseWait()
+                setHTML(ID+'_controldeviceactivationstatusresult','<h6> '+option+' SUCCESS !! - Please Refersh Page.</h6>')
 
-    }).catch(function(error) {
-        println("FAILED !!")
-        println(error)  
+                //hidePleaseWait()
 
-        setHTML(ID+'_controldeviceactivationstatusresult','<h6>FAILED !! - Please Refersh Page.</h6>')
-        
-        //hidePleaseWait()
+            }).catch(function(error) {
+                println("FAILED !!")
+                println(error)  
+
+                setHTML(ID+'_controldeviceactivationstatusresult','<h6> '+option+' FAILED !! - Please Refersh Page.</h6>')
+                
+                //hidePleaseWait()
+            });
+
+    }
+
+}
+
+// Check Device Current Status
+function checkDeviceCurrentStatus(details) {
+
+    println(details)
+
+    setHTML(details + '_checkdevicecurrentstatussection','<h6>Please Wait ...</h6>')
+
+    var dbRealRef = db_real.ref(project_name + '/DEVICE/' + details + '/DEVICESTATUS');
+    dbRealRef.on('value', function(snapshot) {
+        println('Device Status Details !!')
+        let deviceStatusDetails = snapshot.val()
+        // Object.keys(realtimeinfodetails).length > 0
+        if(deviceStatusDetails != null) {
+            setHTML(details + '_checkdevicecurrentstatussection','<h6>Device Status :  ' + deviceStatusDetails['CURRENT'] + '</h6>')
+        }       
+
     });
 
+    
 }
 
 // -------------- PIN Config Handling ------------------------
@@ -993,7 +1054,7 @@ async function addNewDevice() {
          dbData['ADDRESS'] = deviceaddress
          dbData['DETAILS'] = devicename + ' Information and Notes.'
          dbData['MODE'] = 'PRO'
-         dbData['ENABLE'] = 'FALSE'
+         dbData['ENABLE'] = 'TRUE'
          dbData['DISPLAY'] = 'FALSE'
          dbData['REALTIMESTATUS'] = 'FALSE' 
          dbData['REALTIMEMAXLIMIT'] = '10'     
@@ -1004,6 +1065,8 @@ async function addNewDevice() {
          dbData['SERVERHANDLING'] = 'FALSE'
          dbData['SERVERCNTFCNMODE'] = 'MODE1'
          dbData['COLLECTIONTIME'] = '15'
+
+         dbData['UPDATEDOUTSTATUS'] = 'FALSE'
          
 
          showPleaseWait()
@@ -1015,16 +1078,30 @@ async function addNewDevice() {
             });
 
         // Set Sample Device Document
-        await db.collection(getFirestorePath('DEVICE_SAMPLE')).doc(devicename).set({NAME : devicename}).then(function() {        
+        await db.collection(getFirestorePath('DEVICESAMPLE')).doc(devicename).set({NAME : devicename}).then(function() {        
             }).then(function() {
                 println(devicename + ' : Sample Added')
             });
 
+        
+         // Set Sample Device Document
+         await db.collection(getFirestorePath('DEVICESAMPLEFAILED')).doc(devicename).set({NAME : devicename}).then(function() {        
+        }).then(function() {
+            println(devicename + ' : Sample Added')
+        });
+
          // Set Analysis Device Document
-         await db.collection(getFirestorePath('DEVICE_ANALYSIS')).doc(devicename).set({NAME : devicename}).then(function() {        
+         await db.collection(getFirestorePath('DEVICEANALYSIS')).doc(devicename).set({NAME : devicename}).then(function() {        
             }).then(function() {
                 println(devicename + ' : Analysis Added')
             });
+
+
+             // Set Sample Device Document
+        await db.collection(getFirestorePath('DEVICEANALYSISFAILED')).doc(devicename).set({NAME : devicename}).then(function() {        
+        }).then(function() {
+            println(devicename + ' : Sample Added')
+        });
 
 
              // Update Realtime Database
@@ -1132,6 +1209,8 @@ async function updateEachDeviceDetails(key) {
     var deviceserverfcnmode = getHTMLValue(key + "_deviceserverfcnmode");
     var deviceactiveconfig = getHTMLValue(key + "_deviceactiveconfig");
     var devicecollectiontime = getHTMLValue(key + "_devicecollectiontime");
+    var devicupdatedoutstatus = getHTMLValue(key + "_devicupdatedoutstatus");
+    
 
     if(validateInput) {
 
@@ -1159,6 +1238,8 @@ async function updateEachDeviceDetails(key) {
          dbData['SERVERHANDLING'] = deviceserverhandling
          dbData['SERVERCNTFCNMODE'] = deviceserverfcnmode
          dbData['COLLECTIONTIME'] = devicecollectiontime
+
+         dbData['UPDATEDOUTSTATUS'] = devicupdatedoutstatus
  
          
          showPleaseWait()
@@ -1169,45 +1250,12 @@ async function updateEachDeviceDetails(key) {
                 println(devicename + ' : Main Added')
             });
 
-        // Set Sample Device Document
-        await db.collection(getFirestorePath('DEVICE_SAMPLE')).doc(devicename).set({NAME : devicename}).then(function() {        
-            }).then(function() {
-                println(devicename + ' : Sample Added')
-            });
-
-         // Set Analysis Device Document
-         await db.collection(getFirestorePath('DEVICE_ANALYSIS')).doc(devicename).set({NAME : devicename}).then(function() {        
-            }).then(function() {
-                println(devicename + ' : Analysis Added')
-            });
-
-
             // Update Realtime Database
             await db_real.ref(project_name + '/DEVICE/' + devicename + '/INFO').set(dbData).then(function() {        
             }).then(function() {
                 println(devicename + ' : Realtime INFO Added')
             });
-            
-
-            /*
-            await db_real.ref(project_name + '/DEVICE/' + devicename + '/ACTIVESTATUS').set({
-                ACTIVE : 0
-            }).then(function() {
-                println(devicename + ' : Realtime ACTIVE STATUS Added')
-            });
-
-            await db_real.ref(project_name + '/DEVICE/' + devicename + '/REALTIMESAMPLE').set({
-                DATA : [0, 0 , 0]
-            }).then(function() {
-                println(devicename + ' : Realtime REALTIMESAMPLE Added')
-            });
-
-            await db_real.ref(project_name + '/DEVICE/' + devicename + '/CONTROL').set({
-                DATA : [0, 0 , 0]
-            }).then(function() {
-                println(devicename + ' : Realtime CONTROL')
-            });
-            */
+        
 
 
             hidePleaseWait()
